@@ -1,0 +1,23 @@
+body {
+    padding-top: 60px; /* Espacio para el menú fijo */
+}
+
+.container {
+    max-width: 1200px;
+}
+
+/* Estilo para formularios */
+form {
+    margin-top: 20px;
+}
+
+/* Mensajes de error */
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+/* Botones */
+.btn-custom {
+    margin-top: 10px;
+}
