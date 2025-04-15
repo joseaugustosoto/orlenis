@@ -21,13 +21,27 @@ mostrarMenu();
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Bienvenido</h2>
+        <h2>Bienvenido al Sistema de Exámenes</h2>
+        <p>Selecciona una de las opciones disponibles según tu rol:</p>
+
         <?php if (isAdmin()): ?>
-            <p>Accede al <a href="admin.php" class="btn btn-primary">Panel de Administrador</a>.</p>
+            <div class="list-group">
+                <a href="gestion_usuarios.php" class="list-group-item list-group-item-action">Gestión de Usuarios</a>
+                <a href="gestion_materias.php" class="list-group-item list-group-item-action">Gestión de Materias</a>
+                <a href="asignar_materias.php" class="list-group-item list-group-item-action">Asignar Materias</a>
+                <a href="gestion_grados_secciones.php" class="list-group-item list-group-item-action">Gestión de Grados y Secciones</a>
+                <a href="gestion_estudiantes.php" class="list-group-item list-group-item-action">Gestión de Estudiantes</a>
+            </div>
         <?php elseif (isProfesor()): ?>
-            <p>Accede al <a href="profesor.php" class="btn btn-primary">Panel del Profesor</a>.</p>
+            <div class="list-group">
+                <a href="gestion_pruebas.php" class="list-group-item list-group-item-action">Gestión de Pruebas</a>
+                <a href="gestion_estudiantes.php" class="list-group-item list-group-item-action">Gestión de Estudiantes</a>
+            </div>
         <?php elseif (isEstudiante()): ?>
-            <p>Accede al <a href="estudiante.php" class="btn btn-primary">Panel del Estudiante</a>.</p>
+            <div class="list-group">
+                <a href="responder_pruebas.php" class="list-group-item list-group-item-action">Responder Pruebas</a>
+                <a href="mis_pruebas.php" class="list-group-item list-group-item-action">Pruebas Realizadas</a>
+            </div>
         <?php endif; ?>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

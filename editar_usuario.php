@@ -15,12 +15,15 @@ if (!$id_usuario) {
 }
 
 // Obtener datos generales del usuario
-$stmt = $pdo->prepare("SELECT * FROM Usuarios WHERE id_usuario = :id_usuario");
+$stmt = $pdo->prepare("SELECT u.*, r.nombre_rol AS rol 
+                       FROM usuarios u
+                       JOIN roles r ON u.id_rol = r.id_rol
+                       WHERE u.id_usuario = :id_usuario");
 $stmt->execute(['id_usuario' => $id_usuario]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$usuario) {
-    die("Usuario no encontrado.");
+if (!$usuario || !isset($usuario['rol'])) {
+    die("Usuario no encontrado o rol no asignado.");
 }
 
 // Obtener datos específicos según el rol
@@ -29,23 +32,21 @@ $apellido = '';
 $grado = '';
 $seccion = '';
 
-if ($usuario['rol'] === 'profesor') {
-    $stmt = $pdo->prepare("SELECT nombre, apellido FROM Profesores WHERE id_profesor = :id_profesor");
-    $stmt->execute(['id_profesor' => $id_usuario]);
-    $datos_profesor = $stmt->fetch(PDO::FETCH_ASSOC);
-    if ($datos_profesor) {
-        $nombre = $datos_profesor['nombre'];
-        $apellido = $datos_profesor['apellido'];
-    }
-} elseif ($usuario['rol'] === 'estudiante') {
-    $stmt = $pdo->prepare("SELECT nombre, apellido, grado, seccion FROM Estudiantes WHERE id_estudiante = :id_estudiante");
-    $stmt->execute(['id_estudiante' => $id_usuario]);
+if ($usuario['id_rol'] == 2) { // Profesor
+    $nombre = $usuario['primer_nombre'];
+    $apellido = $usuario['primer_apellido'];
+} elseif ($usuario['id_rol'] == 3) { // Estudiante
+    $stmt = $pdo->prepare("SELECT g.nombre_grado, s.nombre_seccion 
+                           FROM usuario_grado_seccion r
+                           JOIN grados g ON r.id_grado = g.id_grado
+                           JOIN secciones s ON r.id_seccion = s.id_seccion
+                           WHERE r.id_usuario = :id_usuario");
+    $stmt->execute(['id_usuario' => $id_usuario]);
     $datos_estudiante = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if ($datos_estudiante) {
-        $nombre = $datos_estudiante['nombre'];
-        $apellido = $datos_estudiante['apellido'];
-        $grado = $datos_estudiante['grado'];
-        $seccion = $datos_estudiante['seccion'];
+        $grado = $datos_estudiante['nombre_grado'];
+        $seccion = $datos_estudiante['nombre_seccion'];
     }
 }
 
@@ -58,67 +59,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $rol = $_POST['rol'];
     $activo = isset($_POST['activo']) ? 1 : 0;
 
+    // Nuevos campos
+    $primer_nombre = trim($_POST['primer_nombre']);
+    $segundo_nombre = trim($_POST['segundo_nombre']);
+    $primer_apellido = trim($_POST['primer_apellido']);
+    $segundo_apellido = trim($_POST['segundo_apellido']);
+    $fecha_nacimiento = $_POST['fecha_nacimiento'];
+    $correo = trim($_POST['correo']);
+    $telefono = trim($_POST['telefono']);
+
     // Validar que los campos no estén vacíos
-    if (empty($nombre_usuario) || empty($rol)) {
-        $error = 'Todos los campos son obligatorios.';
+    if (empty($nombre_usuario) || empty($rol) || empty($primer_nombre) || empty($primer_apellido) || empty($fecha_nacimiento) || empty($correo)) {
+        $error = 'Todos los campos obligatorios deben ser completados.';
     } else {
         // Actualizar datos generales del usuario
-        $stmt = $pdo->prepare("UPDATE Usuarios SET nombre_usuario = :nombre_usuario, rol = :rol, activo = :activo WHERE id_usuario = :id_usuario");
+        $stmt = $pdo->prepare("UPDATE usuarios SET 
+            nombre_usuario = :nombre_usuario, 
+            id_rol = :id_rol, 
+            activo = :activo, 
+            primer_nombre = :primer_nombre, 
+            segundo_nombre = :segundo_nombre, 
+            primer_apellido = :primer_apellido, 
+            segundo_apellido = :segundo_apellido, 
+            fecha_nacimiento = :fecha_nacimiento, 
+            correo = :correo, 
+            telefono = :telefono 
+            WHERE id_usuario = :id_usuario");
         $stmt->execute([
             'nombre_usuario' => $nombre_usuario,
-            'rol' => $rol,
+            'id_rol' => $rol,
             'activo' => $activo,
+            'primer_nombre' => $primer_nombre,
+            'segundo_nombre' => $segundo_nombre,
+            'primer_apellido' => $primer_apellido,
+            'segundo_apellido' => $segundo_apellido,
+            'fecha_nacimiento' => $fecha_nacimiento,
+            'correo' => $correo,
+            'telefono' => $telefono,
             'id_usuario' => $id_usuario
         ]);
 
         // Si se proporciona una nueva contraseña, actualizarla
         if (!empty($contrasena)) {
             $contrasena_hash = password_hash($contrasena, PASSWORD_BCRYPT);
-            $stmt = $pdo->prepare("UPDATE Usuarios SET contrasena_hash = :contrasena_hash WHERE id_usuario = :id_usuario");
+            $stmt = $pdo->prepare("UPDATE usuarios SET contrasena_hash = :contrasena_hash WHERE id_usuario = :id_usuario");
             $stmt->execute([
                 'contrasena_hash' => $contrasena_hash,
                 'id_usuario' => $id_usuario
             ]);
         }
 
-        // Actualizar datos específicos según el rol
-        if ($rol === 'profesor') {
-            $nombre = trim($_POST['nombre']);
-            $apellido = trim($_POST['apellido']);
-
-            if (empty($nombre) || empty($apellido)) {
-                $error = 'Los nombres y apellidos son obligatorios para los profesores.';
-            } else {
-                $stmt = $pdo->prepare("REPLACE INTO Profesores (id_profesor, nombre, apellido) VALUES (:id_profesor, :nombre, :apellido)");
-                $stmt->execute([
-                    'id_profesor' => $id_usuario,
-                    'nombre' => $nombre,
-                    'apellido' => $apellido
-                ]);
-            }
-        } elseif ($rol === 'estudiante') {
-            $nombre = trim($_POST['nombre']);
-            $apellido = trim($_POST['apellido']);
-            $grado = trim($_POST['grado']);
-            $seccion = trim($_POST['seccion']);
-
-            if (empty($nombre) || empty($apellido) || empty($grado) || empty($seccion)) {
-                $error = 'Todos los campos son obligatorios para los estudiantes.';
-            } else {
-                $stmt = $pdo->prepare("REPLACE INTO Estudiantes (id_estudiante, nombre, apellido, grado, seccion) VALUES (:id_estudiante, :nombre, :apellido, :grado, :seccion)");
-                $stmt->execute([
-                    'id_estudiante' => $id_usuario,
-                    'nombre' => $nombre,
-                    'apellido' => $apellido,
-                    'grado' => $grado,
-                    'seccion' => $seccion
-                ]);
-            }
-        }
-
-        if (!$error) {
-            $success = 'Usuario actualizado exitosamente.';
-        }
+        $success = 'Usuario actualizado exitosamente.';
     }
 }
 
@@ -145,8 +136,8 @@ mostrarMenu();
         <?php endif; ?>
         <form method="POST" action="">
             <div class="mb-3">
-                <label for="nombre_usuario" class="form-label">Nombre de Usuario:</label>
-                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" value="<?php echo htmlspecialchars($usuario['nombre_usuario']); ?>" required>
+                <label for="nombre_usuario" class="form-label">Número de Cédula:</label>
+                <input type="number" class="form-control" id="nombre_usuario" name="nombre_usuario" value="<?php echo htmlspecialchars($usuario['nombre_usuario']); ?>" required>
             </div>
             <div class="mb-3">
                 <label for="contrasena" class="form-label">Contraseña (dejar en blanco si no deseas cambiarla):</label>
@@ -155,9 +146,13 @@ mostrarMenu();
             <div class="mb-3">
                 <label for="rol" class="form-label">Rol:</label>
                 <select class="form-select" id="rol" name="rol" required onchange="mostrarCamposEspecificos()">
-                    <option value="administrador" <?php echo $usuario['rol'] === 'administrador' ? 'selected' : ''; ?>>Administrador</option>
-                    <option value="profesor" <?php echo $usuario['rol'] === 'profesor' ? 'selected' : ''; ?>>Profesor</option>
-                    <option value="estudiante" <?php echo $usuario['rol'] === 'estudiante' ? 'selected' : ''; ?>>Estudiante</option>
+                    <?php
+                    $stmtRoles = $pdo->query("SELECT id_rol, nombre_rol FROM roles");
+                    $roles = $stmtRoles->fetchAll(PDO::FETCH_ASSOC);
+                    foreach ($roles as $rol) {
+                        echo '<option value="' . $rol['id_rol'] . '"' . ($usuario['id_rol'] == $rol['id_rol'] ? ' selected' : '') . '>' . htmlspecialchars($rol['nombre_rol']) . '</option>';
+                    }
+                    ?>
                 </select>
             </div>
             <div class="mb-3 form-check">
@@ -195,6 +190,36 @@ mostrarMenu();
                     <label for="seccion" class="form-label">Sección:</label>
                     <input type="text" class="form-control" id="seccion" name="seccion" value="<?php echo htmlspecialchars($seccion); ?>">
                 </div>
+            </div>
+
+            <!-- Campos generales -->
+            <div class="mb-3">
+                <label for="primer_nombre" class="form-label">Primer Nombre:</label>
+                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre" value="<?php echo htmlspecialchars($usuario['primer_nombre']); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="segundo_nombre" class="form-label">Segundo Nombre:</label>
+                <input type="text" class="form-control" id="segundo_nombre" name="segundo_nombre" value="<?php echo htmlspecialchars($usuario['segundo_nombre']); ?>">
+            </div>
+            <div class="mb-3">
+                <label for="primer_apellido" class="form-label">Primer Apellido:</label>
+                <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" value="<?php echo htmlspecialchars($usuario['primer_apellido']); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="segundo_apellido" class="form-label">Segundo Apellido:</label>
+                <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido" value="<?php echo htmlspecialchars($usuario['segundo_apellido']); ?>">
+            </div>
+            <div class="mb-3">
+                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento:</label>
+                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($usuario['fecha_nacimiento']); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo Electrónico:</label>
+                <input type="email" class="form-control" id="correo" name="correo" value="<?php echo htmlspecialchars($usuario['correo']); ?>" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono:</label>
+                <input type="number" class="form-control" id="telefono" name="telefono" value="<?php echo htmlspecialchars($usuario['telefono']); ?>">
             </div>
 
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>

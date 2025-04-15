@@ -4,7 +4,7 @@ require_once 'includes/db.php';
 require_once 'includes/menu.php';
 
 // Verificar si ya existen usuarios en la base de datos
-$stmt = $pdo->query("SELECT COUNT(*) AS total_usuarios FROM Usuarios");
+$stmt = $pdo->query("SELECT COUNT(*) AS total_usuarios FROM usuarios");
 $total_usuarios = $stmt->fetch(PDO::FETCH_ASSOC)['total_usuarios'];
 
 // Si ya hay usuarios, verificar que el usuario actual sea administrador
@@ -16,75 +16,54 @@ if ($total_usuarios > 0 && !isAdmin()) {
 $error = '';
 $success = '';
 
+// Obtener los roles desde la base de datos
+$stmt = $pdo->query("SELECT * FROM roles");
+$roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre_usuario = trim($_POST['nombre_usuario']);
     $contrasena = $_POST['contrasena'];
-    $rol = $_POST['rol'];
+    $id_rol = $_POST['rol']; // Este es el id_rol enviado desde el formulario
     $activo = isset($_POST['activo']) ? 1 : 0;
+    $primer_nombre = trim($_POST['primer_nombre']);
+    $segundo_nombre = trim($_POST['segundo_nombre']);
+    $primer_apellido = trim($_POST['primer_apellido']);
+    $segundo_apellido = trim($_POST['segundo_apellido']);
+    $fecha_nacimiento = $_POST['fecha_nacimiento'];
+    $correo = trim($_POST['correo']);
+    $telefono = trim($_POST['telefono']);
 
-    // Validar que los campos no estén vacíos
-    if (empty($nombre_usuario) || empty($contrasena) || empty($rol)) {
-        $error = 'Todos los campos son obligatorios.';
+    // Validar que los campos obligatorios no estén vacíos
+    if (empty($nombre_usuario) || empty($contrasena) || empty($id_rol) || empty($primer_nombre) || empty($primer_apellido) || empty($fecha_nacimiento) || empty($correo)) {
+        $error = 'Todos los campos obligatorios deben ser completados.';
     } else {
-        // Verificar si el nombre de usuario ya existe
-        $stmt = $pdo->prepare("SELECT id_usuario FROM Usuarios WHERE nombre_usuario = :nombre_usuario");
-        $stmt->execute(['nombre_usuario' => $nombre_usuario]);
+        // Verificar si el número de cédula o correo ya existen
+        $stmt = $pdo->prepare("SELECT id_usuario FROM usuarios WHERE nombre_usuario = :nombre_usuario OR correo = :correo");
+        $stmt->execute(['nombre_usuario' => $nombre_usuario, 'correo' => $correo]);
         if ($stmt->fetch(PDO::FETCH_ASSOC)) {
-            $error = 'El nombre de usuario ya está en uso.';
+            $error = 'El número de cédula o el correo ya están en uso.';
         } else {
             // Encriptar la contraseña
             $contrasena_hash = password_hash($contrasena, PASSWORD_BCRYPT);
 
             // Insertar el nuevo usuario en la tabla Usuarios
-            $stmt = $pdo->prepare("INSERT INTO Usuarios (nombre_usuario, contrasena_hash, rol, activo) VALUES (:nombre_usuario, :contrasena_hash, :rol, :activo)");
+            $stmt = $pdo->prepare("INSERT INTO usuarios (nombre_usuario, contrasena_hash, id_rol, activo, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, correo, telefono) 
+                                   VALUES (:nombre_usuario, :contrasena_hash, :id_rol, :activo, :primer_nombre, :segundo_nombre, :primer_apellido, :segundo_apellido, :fecha_nacimiento, :correo, :telefono)");
             $stmt->execute([
                 'nombre_usuario' => $nombre_usuario,
                 'contrasena_hash' => $contrasena_hash,
-                'rol' => $rol,
-                'activo' => $activo
+                'id_rol' => $id_rol,
+                'activo' => $activo,
+                'primer_nombre' => $primer_nombre,
+                'segundo_nombre' => $segundo_nombre,
+                'primer_apellido' => $primer_apellido,
+                'segundo_apellido' => $segundo_apellido,
+                'fecha_nacimiento' => $fecha_nacimiento,
+                'correo' => $correo,
+                'telefono' => $telefono
             ]);
 
-            // Obtener el ID del usuario recién creado
-            $id_usuario = $pdo->lastInsertId();
-
-            // Insertar datos adicionales según el rol
-            if ($rol === 'profesor') {
-                $nombre = trim($_POST['nombre']);
-                $apellido = trim($_POST['apellido']);
-
-                if (empty($nombre) || empty($apellido)) {
-                    $error = 'Los nombres y apellidos son obligatorios para los profesores.';
-                } else {
-                    $stmt = $pdo->prepare("INSERT INTO Profesores (id_profesor, nombre, apellido) VALUES (:id_profesor, :nombre, :apellido)");
-                    $stmt->execute([
-                        'id_profesor' => $id_usuario,
-                        'nombre' => $nombre,
-                        'apellido' => $apellido
-                    ]);
-                }
-            } elseif ($rol === 'estudiante') {
-                $nombre = trim($_POST['nombre']);
-                $apellido = trim($_POST['apellido']);
-                $grado = trim($_POST['grado']);
-                $seccion = trim($_POST['seccion']);
-
-                if (empty($nombre) || empty($apellido) || empty($grado) || empty($seccion)) {
-                    $error = 'Todos los campos son obligatorios para los estudiantes.';
-                } else {
-                    $stmt = $pdo->prepare("INSERT INTO Estudiantes (id_estudiante, nombre, apellido, grado, seccion) VALUES (:id_estudiante, :nombre, :apellido, :grado, :seccion)");
-                    $stmt->execute([
-                        'id_estudiante' => $id_usuario,
-                        'nombre' => $nombre,
-                        'apellido' => $apellido,
-                        'grado' => $grado,
-                        'seccion' => $seccion
-                    ]);
-                }
-            }
-
-            if (!$error) {
-                $success = 'Usuario creado exitosamente.';
-            }
+            $success = 'Usuario creado exitosamente.';
         }
     }
 }
@@ -115,72 +94,55 @@ if ($total_usuarios > 0) {
         <?php endif; ?>
         <form method="POST" action="">
             <div class="mb-3">
-                <label for="nombre_usuario" class="form-label">Nombre de Usuario:</label>
-                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                <label for="nombre_usuario" class="form-label">Número de Cédula:</label>
+                <input type="number" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
             </div>
             <div class="mb-3">
-                <label for="contrasena" class="form-label">Contraseña:</label>
+                <label for="contrasena" class="form-label">Contraseña</label>
                 <input type="password" class="form-control" id="contrasena" name="contrasena" required>
             </div>
             <div class="mb-3">
-                <label for="rol" class="form-label">Rol:</label>
-                <select class="form-select" id="rol" name="rol" required onchange="mostrarCamposEspecificos()">
-                    <option value="administrador">Administrador</option>
-                    <option value="profesor">Profesor</option>
-                    <option value="estudiante">Estudiante</option>
+                <label for="primer_nombre" class="form-label">Primer Nombre</label>
+                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre" required>
+            </div>
+            <div class="mb-3">
+                <label for="segundo_nombre" class="form-label">Segundo Nombre</label>
+                <input type="text" class="form-control" id="segundo_nombre" name="segundo_nombre">
+            </div>
+            <div class="mb-3">
+                <label for="primer_apellido" class="form-label">Primer Apellido</label>
+                <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" required>
+            </div>
+            <div class="mb-3">
+                <label for="segundo_apellido" class="form-label">Segundo Apellido</label>
+                <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido">
+            </div>
+            <div class="mb-3">
+                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+            </div>
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo Electrónico</label>
+                <input type="email" class="form-control" id="correo" name="correo" required>
+            </div>
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="number" class="form-control" id="telefono" name="telefono">
+            </div>
+            <div class="mb-3">
+                <label for="rol" class="form-label">Rol</label>
+                <select class="form-select" id="rol" name="rol" required>
+                    <?php foreach ($roles as $rol): ?>
+                        <option value="<?php echo $rol['id_rol']; ?>"><?php echo $rol['descripcion']; ?></option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="activo" name="activo" checked>
                 <label class="form-check-label" for="activo">Activo</label>
             </div>
-
-            <!-- Campos específicos para profesores -->
-            <div id="campos-profesor" style="display: none;">
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombres:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre">
-                </div>
-                <div class="mb-3">
-                    <label for="apellido" class="form-label">Apellidos:</label>
-                    <input type="text" class="form-control" id="apellido" name="apellido">
-                </div>
-            </div>
-
-            <!-- Campos específicos para estudiantes -->
-            <div id="campos-estudiante" style="display: none;">
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombres:</label>
-                    <input type="text" class="form-control" id="nombre" name="nombre">
-                </div>
-                <div class="mb-3">
-                    <label for="apellido" class="form-label">Apellidos:</label>
-                    <input type="text" class="form-control" id="apellido" name="apellido">
-                </div>
-                <div class="mb-3">
-                    <label for="grado" class="form-label">Grado:</label>
-                    <input type="text" class="form-control" id="grado" name="grado">
-                </div>
-                <div class="mb-3">
-                    <label for="seccion" class="form-label">Sección:</label>
-                    <input type="text" class="form-control" id="seccion" name="seccion">
-                </div>
-            </div>
-
             <button type="submit" class="btn btn-primary">Crear Usuario</button>
         </form>
     </div>
-    <script>
-        function mostrarCamposEspecificos() {
-            const rol = document.getElementById('rol').value;
-            const camposProfesor = document.getElementById('campos-profesor');
-            const camposEstudiante = document.getElementById('campos-estudiante');
-
-            camposProfesor.style.display = rol === 'profesor' ? 'block' : 'none';
-            camposEstudiante.style.display = rol === 'estudiante' ? 'block' : 'none';
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/scripts.js"></script>
 </body>
 </html>

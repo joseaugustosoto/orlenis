@@ -20,19 +20,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear'])) {
     if (empty($nombre_materia) || empty($grado) || empty($seccion)) {
         $error = 'Todos los campos son obligatorios.';
     } else {
-        $stmt = $pdo->prepare("INSERT INTO Materias (nombre_materia, grado, seccion) VALUES (:nombre_materia, :grado, :seccion)");
+        $stmt = $pdo->prepare("INSERT INTO materias (nombre_materia, id_grado, id_seccion) VALUES (:nombre_materia, :id_grado, :id_seccion)");
         $stmt->execute([
             'nombre_materia' => $nombre_materia,
-            'grado' => $grado,
-            'seccion' => $seccion
+            'id_grado' => $grado,
+            'id_seccion' => $seccion
         ]);
         $success = 'Materia creada exitosamente.';
     }
 }
 
+// Obtener lista de grados
+$stmtGrados = $pdo->query("SELECT id_grado, nombre_grado FROM grados");
+$grados = $stmtGrados->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener lista de secciones
+$stmtSecciones = $pdo->query("SELECT id_seccion, nombre_seccion FROM secciones");
+$secciones = $stmtSecciones->fetchAll(PDO::FETCH_ASSOC);
+
 // Obtener lista de materias
-$stmt = $pdo->query("SELECT * FROM Materias");
-$materias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmtMaterias = $pdo->query("SELECT m.id_materia, m.nombre_materia, g.nombre_grado, s.nombre_seccion 
+                             FROM materias m
+                             JOIN grados g ON m.id_grado = g.id_grado
+                             JOIN secciones s ON m.id_seccion = s.id_seccion");
+$materias = $stmtMaterias->fetchAll(PDO::FETCH_ASSOC);
 
 mostrarMenu();
 ?>
@@ -66,11 +77,19 @@ mostrarMenu();
             </div>
             <div class="mb-3">
                 <label for="grado" class="form-label">Grado:</label>
-                <input type="text" class="form-control" id="grado" name="grado" required>
+                <select class="form-select" id="grado" name="grado" required>
+                    <?php foreach ($grados as $grado): ?>
+                        <option value="<?php echo $grado['id_grado']; ?>"><?php echo htmlspecialchars($grado['nombre_grado']); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="seccion" class="form-label">Sección:</label>
-                <input type="text" class="form-control" id="seccion" name="seccion" required>
+                <select class="form-select" id="seccion" name="seccion" required>
+                    <?php foreach ($secciones as $seccion): ?>
+                        <option value="<?php echo $seccion['id_seccion']; ?>"><?php echo htmlspecialchars($seccion['nombre_seccion']); ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <button type="submit" name="crear" class="btn btn-primary">Crear Materia</button>
         </form>
@@ -92,8 +111,8 @@ mostrarMenu();
                     <tr>
                         <td><?php echo $materia['id_materia']; ?></td>
                         <td><?php echo htmlspecialchars($materia['nombre_materia']); ?></td>
-                        <td><?php echo htmlspecialchars($materia['grado']); ?></td>
-                        <td><?php echo htmlspecialchars($materia['seccion']); ?></td>
+                        <td><?php echo htmlspecialchars($materia['nombre_grado']); ?></td>
+                        <td><?php echo htmlspecialchars($materia['nombre_seccion']); ?></td>
                         <td>
                             <a href="editar_materia.php?id=<?php echo $materia['id_materia']; ?>" class="btn btn-sm btn-warning">Editar</a>
                             <a href="eliminar_materia.php?id=<?php echo $materia['id_materia']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro de eliminar esta materia?')">Eliminar</a>

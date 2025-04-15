@@ -8,7 +8,9 @@ if (!isAdmin()) {
     exit;
 }
 
-$stmt = $pdo->query("SELECT id_usuario, nombre_usuario, rol, activo FROM Usuarios");
+$stmt = $pdo->query("SELECT u.id_usuario, u.nombre_usuario, u.primer_nombre, u.primer_apellido, r.nombre_rol AS rol, u.activo 
+                     FROM usuarios u
+                     JOIN roles r ON u.id_rol = r.id_rol");
 $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 mostrarMenu();
@@ -32,6 +34,8 @@ mostrarMenu();
                 <tr>
                     <th>ID</th>
                     <th>Nombre de Usuario</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
                     <th>Rol</th>
                     <th>Activo</th>
                     <th>Acciones</th>
@@ -42,6 +46,8 @@ mostrarMenu();
                     <tr>
                         <td><?php echo $usuario['id_usuario']; ?></td>
                         <td><?php echo $usuario['nombre_usuario']; ?></td>
+                        <td><?php echo $usuario['primer_nombre']; ?></td>
+                        <td><?php echo $usuario['primer_apellido']; ?></td>
                         <td><?php echo $usuario['rol']; ?></td>
                         <td><?php echo $usuario['activo'] ? 'Sí' : 'No'; ?></td>
                         <td>

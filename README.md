@@ -2,35 +2,46 @@
 **Autores:**  
 Barrera Melinda CI 30.199.175  
 Casanova Orlenis CI 14.051.731  
-Morán René CI 13.829.311  
-Reyes Franyeli CI 31.221.740  
+Morán René CI 13.829.311 
 Rivero Victor CI 31.221.042  
 Docente Asesor: José Manuel  
 
 ## Descripción de Archivos
 
-- **admin.php**: Página principal del administrador donde puede gestionar usuarios, materias y exámenes.
-- **asignar_materias.php**: Permite asignar materias a los profesores.
-- **crear_usuario.php**: Formulario para crear nuevos usuarios (administradores, profesores y estudiantes).
-- **css/styles.css**: Archivo de estilos CSS para la aplicación.
-- **dashboard.php**: Panel de control que muestra un resumen de las actividades y estadísticas.
-- **editar_materia.php**: Permite editar la información de una materia existente.
-- **editar_usuario.php**: Permite editar la información de un usuario existente.
-- **eliminar_materia.php**: Permite eliminar una materia del sistema.
-- **estructura_del_proyecto.md**: Documento que describe la estructura del proyecto.
-- **estudiante.php**: Página principal del estudiante donde puede ver y responder exámenes.
-- **gestion_examenes.php**: Permite gestionar los exámenes (crear, editar, eliminar).
-- **gestion_materias.php**: Permite gestionar las materias (crear, editar, eliminar).
-- **gestion_usuarios.php**: Permite gestionar los usuarios (crear, editar, eliminar).
-- **includes/auth.php**: Archivo de autenticación para gestionar el inicio de sesión y la seguridad.
-- **includes/db.php**: Archivo de conexión a la base de datos.
-- **includes/menu.php**: Archivo que contiene el menú de navegación.
-- **index.php**: Página de inicio de sesión.
-- **js/scripts.js**: Archivo de scripts JavaScript para la aplicación.
-- **logout.php**: Permite cerrar la sesión del usuario.
-- **profesor.php**: Página principal del profesor donde puede gestionar sus materias y exámenes.
-- **responder_examen.php**: Permite a los estudiantes responder a los exámenes.
-- **sistemaexamenes.sql**: Script SQL para crear la base de datos y las tablas necesarias.
+/                                 // Raíz de la página
+├── asignar_materias.php          // Permite asignar materias a profesores o estudiantes.
+├── crear_usuario.php             // Formulario para crear nuevos usuarios en el sistema.
+├── css/
+│   └── styles.css                // Archivo de estilos CSS para el diseño del sistema.
+├── dashboard.php                 // Panel principal que muestra un resumen de las actividades o estadísticas.
+├── editar_materia.php            // Permite editar la información de una materia existente.
+├── editar_usuario.php            // Permite editar los datos de un usuario registrado.
+├── eliminar_materia.php          // Proporciona funcionalidad para eliminar materias del sistema.
+├── estructura_del_proyecto.md    // Documento que describe la estructura del proyecto.
+├── estudiante.php                // Página principal para los estudiantes, muestra sus opciones y actividades.
+├── evaluar_prueba.php            // Permite a los profesores evaluar las pruebas realizadas por los estudiantes.
+├── gestion_estudiantes.php       // Gestión de estudiantes: agregar, editar o eliminar registros.
+├── gestion_grados_secciones.php  // Gestión de grados y secciones dentro del sistema.
+├── gestion_materias.php          // Gestión de materias: agregar, editar o eliminar materias.
+├── gestion_pruebas.php           // Gestión de pruebas: creación, edición y eliminación de pruebas.
+├── gestion_usuarios.php          // Gestión de usuarios: administración de roles y permisos.
+├── gestionar_pruebas.php         // Página para gestionar las pruebas asignadas a los estudiantes.
+├── guardar_calificaciones.php    // Guarda las calificaciones de los estudiantes en la base de datos.
+├── includes/
+│   ├── auth.php                  // Archivo de autenticación, verifica el acceso de los usuarios.
+│   ├── db.php                    // Conexión a la base de datos y funciones relacionadas.
+│   └── menu.php                  // Genera el menú de navegación dinámico según el rol del usuario.
+├── index.php                     // Página de inicio del sistema, posiblemente el login.
+├── js/
+│   └── scripts.js                // Archivo JavaScript para funcionalidades dinámicas del sistema.
+├── logout.php                    // Cierra la sesión del usuario y redirige al login.
+├── mis_pruebas.php               // Muestra las pruebas asignadas al usuario actual.
+├── obtener_secciones.php         // Devuelve las secciones disponibles, posiblemente mediante AJAX.
+├── profesor.php                  // Página principal para los profesores, muestra sus opciones y actividades.
+├── README.md                     // Archivo de documentación general del proyecto.
+├── responder_preguntas.php       // Permite a los estudiantes responder preguntas de una prueba.
+├── responder_pruebas.php         // Página para que los estudiantes respondan las pruebas asignadas.
+└── sistemaexamenes.sql           // Script SQL para la creación de la base de datos del sistema.
 
 ## Instalación
 
