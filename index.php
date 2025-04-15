@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <form method="POST" action="">
                             <div class="mb-3">
                                 <label for="nombre_usuario" class="form-label">Nombre de Usuario:</label>
-                                <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
+                                <input type="number" class="form-control" id="nombre_usuario" name="nombre_usuario" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contrasena" class="form-label">Contraseña:</label>
