@@ -2,7 +2,7 @@
 **Autores:**  
 Barrera Melinda CI 30.199.175  
 Casanova Orlenis CI 14.051.731  
-Morán René CI 13.829.311 
+Morán René CI 13.829.311  
 Rivero Victor CI 31.221.042  
 Docente Asesor: José Manuel  
 
