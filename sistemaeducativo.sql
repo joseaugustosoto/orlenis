@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `sistemaexamenes`
+-- Base de datos: `sistemaeducativo`
 --
 
 -- --------------------------------------------------------
@@ -26,6 +26,9 @@ SET time_zone = "+00:00";
 --
 -- Estructura de tabla para la tabla `grados`
 --
+
+CREATE DATABASE IF NOT EXISTS `sistemaeducativo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE `sistemaeducativo`;
 
 CREATE TABLE `grados` (
   `id_grado` int(11) NOT NULL,
