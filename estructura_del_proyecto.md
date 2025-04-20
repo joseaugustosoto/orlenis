@@ -3,7 +3,7 @@
 ├── crear_usuario.php             // Formulario para crear nuevos usuarios en el sistema.
 ├── css/
 │   └── styles.css                // Archivo de estilos CSS para el diseño del sistema.
-├── dashboard.php                 // Panel principal que muestra un resumen de las actividades o estadísticas.
+├── dashboard.php                 // Panel principal que muestra accesos a las actividades más frecuentes.
 ├── editar_materia.php            // Permite editar la información de una materia existente.
 ├── editar_usuario.php            // Permite editar los datos de un usuario registrado.
 ├── eliminar_materia.php          // Proporciona funcionalidad para eliminar materias del sistema.
