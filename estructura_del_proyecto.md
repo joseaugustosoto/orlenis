@@ -31,4 +31,4 @@
 ├── README.md                     // Archivo de documentación general del proyecto.
 ├── responder_preguntas.php       // Permite a los estudiantes responder preguntas de una prueba.
 ├── responder_pruebas.php         // Página para que los estudiantes respondan las pruebas asignadas.
-└── sistemaexamenes.sql           // Script SQL para la creación de la base de datos del sistema.
+└── sistemaeducativo.sql           // Script SQL para la creación de la base de datos del sistema.
