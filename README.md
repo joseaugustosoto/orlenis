@@ -14,7 +14,7 @@ Docente Asesor: José Manuel
 ├── crear_usuario.php                   // Formulario para crear nuevos usuarios en el sistema.
 ├── css/
 │   └── styles.css                      // Archivo de estilos CSS para el diseño del sistema.
-├── dashboard.php                       // Panel principal que muestra un resumen de las actividades o estadísticas.
+├── dashboard.php                       // Panel principal que muestra accesos a las actividades más frecuentes.
 ├── editar_materia.php                  // Permite editar la información de una materia existente.
 ├── editar_usuario.php                  // Permite editar los datos de un usuario registrado.
 ├── eliminar_materia.php                // Proporciona funcionalidad para eliminar materias del sistema.
@@ -48,9 +48,10 @@ Docente Asesor: José Manuel
 ## Instalación
 
 1. Clona el repositorio en tu servidor local.
-2. Importa el archivo `sistemaexamenes.sql` en tu base de datos MySQL.
-3. Configura la conexión a la base de datos en `includes/db.php`.
-4. Abre el navegador y accede a `index.php` para iniciar sesión.
+2. Debes instalar y ejecutar XAMPP para iniciar el servidor Web y de Bases de Datos MariaDB.
+3. Ingresando en `http://localhost/phpmyadmin` importa el archivo `sistemaeducativo.sql` esto creará tu base de datos.
+4. Configura la conexión a la base de datos en `includes/db.php`.
+5. Abre el navegador y accede a `http://localhost/proyecto/index.php` para iniciar sesión.
 
 ## Uso
 
