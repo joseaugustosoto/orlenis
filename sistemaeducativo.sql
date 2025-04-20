@@ -277,8 +277,7 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id_usuario`, `nombre_usuario`, `contrasena_hash`, `id_rol`, `primer_nombre`, `segundo_nombre`, `primer_apellido`, `segundo_apellido`, `fecha_nacimiento`, `correo`, `telefono`, `activo`) VALUES
 (1, '12345678', '$2y$10$v7rZOmsdNhwKBv4V.caHquRTzWqZ7Rw.f4zp2NvbABVB4ZnymWzUC', 1, 'ADMIN', 'A', 'DIAZ', 'G', '1960-01-01', '12345678@gmail.com', '04121234567', 1),
 (2, '123456789', '$2y$10$40ZKcKqUrpfqrw9oUnG5yO9KQeCDrDI8GO08eG8v2SUA1sRcs3cYm', 2, 'PROF', 'A', 'DIAZ', 'G', '1950-06-01', '123456789@gmail.com', '04121234567', 1),
-(3, '1234567890', '$2y$10$XdmSYfAiVVlkUxftVYkZqeLjw0uLnPU6cXDKD1a1hWd7PwAPEP4jm', 3, 'ESTU', 'A', 'DIAZ', 'G', '1950-01-01', '1234567890@gmail.com', '04121234567', 1),
-(4, '17952404', '$2y$10$SQDF0IGjW2hgJyz8YgXw8.0a6wtquu/o4rP3hVZaHDzKDyhVvGrjC', 1, 'JOSE', 'A', 'SOTO', 'G', '1985-07-22', 'soviwebs@gmail.com', '04126487258', 1);
+(3, '1234567890', '$2y$10$XdmSYfAiVVlkUxftVYkZqeLjw0uLnPU6cXDKD1a1hWd7PwAPEP4jm', 3, 'ESTU', 'A', 'DIAZ', 'G', '1950-01-01', '1234567890@gmail.com', '04121234567', 1);
 
 -- --------------------------------------------------------
 
